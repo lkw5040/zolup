@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="들은 과목을 톡. 경희대 소프트웨어융합학과 졸업까지 남은 길을 퀘스트 지도로 확인하는 모바일 웹앱">
+<meta name="theme-color" content="#720e28" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#2a0f19" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="졸업 원정대">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23820d30'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle'%3E%F0%9F%8F%B0%3C/text%3E%3C/svg%3E">
+<title>졸업 원정대 · 경희졸업길잡이</title>
+<style>
+:root{
+  --bg:#ece2e5;--surface:#fbf7f5;--card:#fff;--ink:#39232b;--muted:#6e5a62;--line:#eadbe0;--line-strong:#dcc4cd;
+  --brand:#820d30;--brand-deep:#720e28;--brand-ink:#fff;--brand-soft:#f9e5ec;--brand-soft-2:#fff0f4;--brand-line:#d796ab;
+  --gold:#f0ce76;--gold-soft:#fff5d4;--gold-deep:#d2ad54;--gray-orb:#f3eff0;--gray-line:#dfd6d9;--gray-deep:#c9b9bf;
+  --ok:#2f7d4f;--warn-bg:#fff6e0;--warn-ink:#6b4a00;--shadow:0 15px 70px #72122e20;--overlay:#30101d80;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0f0709;--surface:#1a0e13;--card:#24151b;--ink:#f4e8ec;--muted:#bba6ae;--line:#3a252d;--line-strong:#4c3039;
+    --brand:#c23b64;--brand-deep:#2a0f19;--brand-ink:#fff;--brand-soft:#3c1a26;--brand-soft-2:#2e1620;--brand-line:#8e3a55;
+    --gold:#b8913a;--gold-soft:#3a2f17;--gold-deep:#8a6a22;--gray-orb:#2a1d22;--gray-line:#3d2b32;--gray-deep:#1b1215;
+    --ok:#6fcf97;--warn-bg:#3a2f17;--warn-ink:#f3d58a;--shadow:none;--overlay:#000a;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.app{max-width:480px;margin:auto;min-height:100dvh;background:var(--surface);position:relative;overflow-x:hidden}
+/* header */
+.top{background:var(--brand-deep);color:#fff;padding:calc(20px + env(safe-area-inset-top)) 20px 18px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.top small{color:#e9c8d0;font-weight:700;letter-spacing:2px;font-size:10px}
+.top h1{margin:6px 0 4px;font-size:26px;letter-spacing:-1px}
+.top p{color:#f3dde3;font-size:13px;margin:0}
+.chip{border:1px solid #ffffff55;background:#ffffff1a;color:#fff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;white-space:nowrap;min-height:36px}
+.banner{margin:12px 16px 0;background:var(--warn-bg);color:var(--warn-ink);border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.6}
+main{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+/* hero */
+.hero{margin:16px 16px 0;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+.ring{--p:0;width:92px;height:92px;border-radius:50%;background:conic-gradient(var(--brand) calc(var(--p)*360deg),var(--line) 0);display:grid;place-items:center;transition:--p .4s}
+.ring>div{width:74px;height:74px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center}
+.ring b{font-size:22px;letter-spacing:-.5px;display:block}
+.ring small{font-size:10px;color:var(--muted)}
+.hero h2{margin:0 0 4px;font-size:16px}
+.muted{font-size:12px;color:var(--muted);line-height:1.6}
+.bar{height:8px;background:var(--line);border-radius:10px;margin:8px 0 4px;overflow:hidden}
+.bar i{display:block;background:var(--brand);height:100%;border-radius:10px;transition:width .4s}
+.next{grid-column:1/-1;width:100%;background:var(--brand);color:var(--brand-ink);border:0;border-radius:14px;padding:14px;font-size:14px;font-weight:800;min-height:48px}
+/* map */
+.map{list-style:none;margin:0;position:relative;padding:28px 18px 0}
+.map:before{content:'';position:absolute;top:50px;bottom:40px;left:50%;width:4px;margin-left:-2px;background:repeating-linear-gradient(to bottom,var(--line-strong) 0 8px,transparent 8px 16px)}
+.stop{position:relative;display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.stop.rev{flex-direction:row-reverse}
+.orb-wrap{--p:0;flex-shrink:0;padding:4px;border-radius:30px;background:conic-gradient(var(--ringc,var(--gray-line)) calc(var(--p)*360deg),var(--gray-line) 0)}
+.orb{width:72px;height:72px;border:0;background:var(--gray-orb);box-shadow:0 5px 0 var(--gray-deep);border-radius:26px;display:grid;place-items:center;font-size:32px;position:relative;transition:transform .15s}
+.orb:active{transform:translateY(3px);box-shadow:0 2px 0 var(--gray-deep)}
+.orb .emo{filter:grayscale(1);opacity:.7;transition:.35s}
+.st-partial .orb-wrap{--ringc:var(--gold)}
+.st-partial .orb{background:var(--gold-soft);box-shadow:0 5px 0 var(--gold-deep)}
+.st-partial .orb .emo,.st-done .orb .emo{filter:none;opacity:1}
+.st-done .orb-wrap{--ringc:var(--brand)}
+.st-done .orb{background:var(--brand-soft);box-shadow:0 5px 0 var(--brand)}
+.badge{position:absolute;right:-8px;top:-8px;border:3px solid var(--surface);border-radius:50%;background:var(--brand);color:#fff;font-size:13px;width:26px;height:26px;display:grid;place-items:center;font-weight:800}
+.st-unknown .badge{background:var(--muted)}
+.label{flex:1;max-width:260px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;text-align:left;min-height:72px}
+.label b{display:block;font-size:14px}
+.label small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.label .meta{display:block;font-size:12px;margin-top:4px;font-weight:600}
+.mini{display:block;height:4px;background:var(--line);border-radius:4px;margin-top:8px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--brand);border-radius:4px}
+.st-partial .mini i{background:var(--gold-deep)}
+.castle{text-align:center;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin:6px 18px 18px;position:relative}
+.castle .icon{font-size:46px;filter:grayscale(1);opacity:.75;transition:.4s}
+.castle.finished{border-color:var(--brand-line);background:var(--brand-soft-2)}
+.castle.finished .icon{filter:none;opacity:1}
+.castle b{display:block;font-size:18px;margin:4px}
+.notice{margin:0 18px 8px;font-size:11px;color:var(--muted);line-height:1.7}
+/* generic */
+.view{padding:16px}
+.view h2{font-size:21px;margin:6px 0 4px;letter-spacing:-.5px}
+.view h3{font-size:15px;margin:22px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.btn{border:1px solid var(--line-strong);background:var(--card);border-radius:12px;padding:12px 14px;font-size:13px;font-weight:700;min-height:46px;color:var(--ink)}
+.btn.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.btn.danger{color:#b3263e;border-color:#e7b3bf}
+.btn.block{width:100%}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.field{display:block;margin:12px 0}
+.field span{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+select,.input,textarea{width:100%;background:var(--card);border:1px solid var(--line-strong);border-radius:12px;padding:12px;font-size:14px;min-height:46px}
+textarea{min-height:160px;resize:vertical;line-height:1.5}
+.empty{text-align:center;padding:26px 10px;color:var(--muted);font-size:13px;line-height:1.7}
+.empty .big{font-size:36px;display:block;margin-bottom:6px}
+.pill{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 8px;background:var(--brand-soft);color:var(--brand)}
+.list-item{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.list-item:first-child{border-top:0}
+.list-item .grow{flex:1;min-width:0}
+.list-item b{font-size:14px;display:block}
+.list-item small{font-size:11px;color:var(--muted)}
+.icon-btn{border:1px solid var(--line-strong);background:var(--card);border-radius:10px;min-width:44px;min-height:40px;font-size:12px;font-weight:700;padding:0 10px}
+.icon-btn.on{background:var(--brand-soft);border-color:var(--brand-line);color:var(--brand)}
+/* tab bar */
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:5}
+.tab{position:relative;border:0;background:none;padding:6px 0;display:grid;justify-items:center;gap:2px;font-size:11px;color:var(--muted);font-weight:700;min-height:52px;border-radius:12px}
+.tab svg{width:24px;height:24px}
+.tab[aria-current=page]{color:var(--brand)}
+.tab .dot{min-width:16px;height:16px;border-radius:8px;background:var(--brand);color:#fff;font-size:10px;line-height:16px;padding:0 4px;position:absolute;top:2px;left:calc(50% + 6px)}
+/* sheet */
+.veil{position:fixed;inset:0;background:var(--overlay);z-index:10;display:flex;justify-content:center;align-items:flex-end;animation:fade .2s}
+.sheet{width:100%;max-width:480px;max-height:90dvh;background:var(--card);border-radius:26px 26px 0 0;overflow:auto;overscroll-behavior:contain;padding:0 18px calc(24px + env(safe-area-inset-bottom));animation:up .25s ease-out}
+.sheet-head{position:sticky;top:0;background:var(--card);padding:10px 0 8px;z-index:1}
+.handle{height:4px;background:var(--line-strong);width:36px;border-radius:8px;margin:0 auto 12px}
+.sheet h2{font-size:21px;margin:0;letter-spacing:-.5px}
+.sheet .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.close{border:0;border-radius:50%;background:var(--brand-soft);color:var(--brand);width:40px;height:40px;font-size:22px;flex-shrink:0}
+.task{display:flex;align-items:center;gap:10px;margin:8px 0}
+.task .main{flex:1;display:flex;align-items:center;gap:12px;padding:12px 10px;border:1px solid var(--line);background:var(--card);border-radius:14px;text-align:left;min-height:62px;min-width:0}
+.task .token{filter:grayscale(1);opacity:.5;background:var(--gray-orb);border-radius:12px;padding:8px;font-size:20px;line-height:1}
+.task .txt{flex:1;min-width:0}
+.task b{font-size:14px;display:block}
+.task small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+.task .tick{font-size:20px;color:var(--brand);width:24px;text-align:center}
+.task.done .main{background:var(--brand-soft-2);border-color:var(--brand-line)}
+.task.done .token{filter:none;opacity:1;background:var(--brand-soft)}
+.task .plan{width:56px;min-height:62px;border-radius:14px;border:1px dashed var(--line-strong);background:var(--card);font-size:11px;font-weight:700;color:var(--muted);line-height:1.3}
+.task .plan.on{border-style:solid;border-color:var(--gold-deep);background:var(--gold-soft);color:var(--ink)}
+.stepper{display:flex;align-items:center;gap:8px;margin:6px 0 14px}
+.stepper button{width:48px;height:48px;border-radius:12px;border:1px solid var(--line-strong);background:var(--card);font-size:22px;font-weight:700;color:var(--brand)}
+.stepper input{flex:1;text-align:center;font-size:20px;font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:8px 0 14px}
+.seg button{border:1px solid var(--line-strong);background:var(--card);border-radius:12px;padding:10px;font-size:13px;font-weight:700;min-height:44px}
+.seg button[aria-pressed=true]{background:var(--brand);color:#fff;border-color:var(--brand)}
+.check-row{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.check-row input{width:22px;height:22px;margin-top:1px;accent-color:var(--brand);flex-shrink:0}
+/* onboarding */
+.onboard{padding:24px 20px calc(30px + env(safe-area-inset-bottom))}
+.onboard .hero-emoji{font-size:56px;text-align:center;margin:10px 0}
+.onboard h2{text-align:center;font-size:24px;margin:4px 0 6px;letter-spacing:-.6px}
+.onboard ol{padding-left:20px;line-height:1.9;font-size:14px}
+/* toast & fx */
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#2b1019;color:#fff;border-radius:16px;padding:12px 14px 12px 18px;z-index:20;box-shadow:0 8px 28px #0004;font-size:13px;width:max-content;max-width:calc(100vw - 32px);display:flex;gap:12px;align-items:center;animation:pop .25s}
+.toast button{background:none;border:0;color:#ffc4d4;font-weight:800;padding:8px;min-height:40px}
+.spark{position:fixed;pointer-events:none;z-index:30;font-size:24px;animation:fly 1.1s ease-out forwards}
+@keyframes pop{from{transform:translate(-50%,12px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(150deg);opacity:0}}
+@keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (min-width:520px){body{padding:20px 0}.app{border-radius:26px;box-shadow:var(--shadow);overflow:hidden;min-height:calc(100dvh - 40px)}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div>
+      <small>KHU · SOFTWARE CONVERGENCE</small>
+      <h1>졸업 원정대 🧭</h1>
+      <p>들은 과목을 톡. 졸업까지 길을 밝혀요.</p>
+    </div>
+    <button class="chip" id="profileChip" data-act="tab" data-tab="me" hidden></button>
+  </header>
+  <div id="storageBanner" class="banner" role="alert" hidden>이 브라우저에는 기록이 저장되지 않아요. 설정에서 백업 파일로 보관해 주세요.</div>
+  <main id="main">
+    <section id="view-onboard" class="onboard" hidden></section>
+    <section id="view-map" aria-label="졸업 퀘스트 지도"></section>
+    <section id="view-plan" class="view" hidden></section>
+    <section id="view-me" class="view" hidden></section>
+  </main>
+  <nav class="tabbar" id="tabbar" aria-label="주요 메뉴" hidden>
+    <button class="tab" data-act="tab" data-tab="map" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>지도</button>
+    <button class="tab" data-act="tab" data-tab="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span id="planDot" class="dot" hidden></span>계획</button>
+    <button class="tab" data-act="tab" data-tab="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>설정</button>
+  </nav>
+</div>
+<div id="veil" class="veil" hidden>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-head">
+      <div class="handle"></div>
+      <div class="row"><div><h2 id="sheetTitle"></h2><div class="sub" id="sheetSub"></div></div><button class="close" data-act="close" aria-label="닫기">×</button></div>
+    </div>
+    <div id="sheetBody"></div>
+  </section>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+<script>
+'use strict';
+/* ───────── 교육과정 데이터 (2026-2 소프트웨어융합학과 단일전공 참고 경로 · 2024학번 이후 교양) ───────── */
+const APP_VERSION = '1.0.0';
+const CATALOG = '2026-2 소프트웨어융합학과 단일전공 · 2024학번 이후 교양';
+const FOUNDATIONS = [['AMTH1001','미분방정식',3],['AMTH1004','선형대수',3],['AMTH1009','미분적분학',3],['APHY1002','물리학및실험1',3],['EE211','확률및랜덤변수',3]];
+const ESSENTIALS = [['CSE103','객체지향프로그래밍',3],['CSE204','자료구조',3],['CSE301','운영체제',3],['CSE304','알고리즘',3],['CSE305','데이터베이스',3],['CSE327','소프트웨어공학',3],['CSE438','최신기술콜로키움1',2],['SWCON101','소프트웨어융합개론',3],['SWCON103','디자인적사고',3],['SWCON104','웹/파이선프로그래밍',3],['SWCON201','오픈소스SW개발방법및도구',3],['SWCON302','최신기술콜로키움2',2],['SWCON401','소프트웨어융합캡스톤디자인',3],['SWCON402','졸업논문(소프트웨어융합)',0]];
+const TRACKS = {
+  data:{name:'데이터사이언스',list:[['SWCON253','기계학습'],['IE','응용통계학'],['SWCON256','데이터분석입문'],['SWCON372','응용데이터분석'],['SWCON321','데이터분석캡스톤디자인']]},
+  game:{name:'게임콘텐츠',list:[['SWCON211','게임프로그래밍입문'],['SWCON212','게임엔진기초'],['SWCON311','게임그래픽프로그래밍'],['SWCON315','게임공학'],['SWCON491','인공지능과게임프로그래밍'],['SWCON312','게임인터랙티브테크놀로지'],['SWCON367','게임콘텐츠캡스톤디자인']]},
+  robot:{name:'로봇·비전',list:[['SWCON291','수치해석프로그래밍'],['SWCON254','회로와신호'],['SWCON366','3D데이터처리'],['SWCON331','로봇프로그래밍'],['SWCON494','영상분석과패턴인식'],['SWCON332','로봇·비전캡스톤디자인']]},
+  leader:{name:'융합리더',list:[]}
+};
+const CORES = [['core1','인간의가치탐색',3],['core2','세계와시민',3],['core3','빅뱅에서문명까지',3],['core4','성찰과표현',3],['core5','주제연구',3],['core6','대학영어',2]];
+const AREAS = ['생명·우주·인간','분석·추론·논리','성·정·문화·소통','사회·공동체·평화','지능·정보·미래'];
+const FINAL = [['total','총 130학점을 채웠어요','전공과 교양을 포함한 전체 취득학점'],['english','전공 영어 수업을 확인했어요','기본 3과목 · 편입생은 별도 기준 확인'],['sw','SW교양·SW코딩을 확인했어요','6학점 기준과 본인의 예외 여부 확인'],['thesis','캡스톤·졸업논문을 확인했어요','수강 순서·논문 제출·산학필수 인정 확인'],['extra','추가 졸업 조건을 확인했어요','2026: 다전공·부전공·마이크로디그리 / 그 외 경과조치 확인']];
+const YEARS = ['2020','2021','2022','2023','2024','2025','2026'];
+const QUESTS = [
+  {id:'base',icon:'🌱',name:'기초 다지기',formal:'전공기초',why:'전공 공부의 바탕이 되는 수학·과학 과목이에요.'},
+  {id:'must',icon:'📌',name:'꼭 들어야 할 수업',formal:'전공필수',why:'졸업하려면 모두 들어야 하는 전공 과목이에요.'},
+  {id:'choose',icon:'💎',name:'내 전공 깊게 배우기',formal:'전공선택 · 트랙필수',why:'트랙필수 과목을 포함해 전공선택 36학점을 채워요.'},
+  {id:'core',icon:'📚',name:'모두의 기본 수업',formal:'필수교양',why:'2024학번 이후 필수 6과목·17학점 기준이에요.'},
+  {id:'dist',icon:'🌍',name:'다른 세상 탐험하기',formal:'배분이수',why:'5개 영역 중 3개 이상, 총 9학점 이상 들어요.'},
+  {id:'free',icon:'🎨',name:'마음 가는 수업',formal:'자유이수',why:'자유이수 3학점 이상을 들어요.'},
+  {id:'final',icon:'🏁',name:'졸업 전 마지막 점검',formal:'총학점 · 별도 요건',why:'앱이 판단하기 어려운 조건을 졸업사정 결과와 비교해 직접 확인해요.'}
+];
+const COURSES = new Map();
+for (const [c,n,cr] of FOUNDATIONS) COURSES.set(c,{code:c,name:n,credit:cr,group:'전공기초'});
+for (const [c,n,cr] of ESSENTIALS) COURSES.set(c,{code:c,name:n,credit:cr,group:'전공필수'});
+for (const [k,t] of Object.entries(TRACKS)) for (const [c,n] of t.list) COURSES.set(c,{code:c,name:n,credit:3,group:'트랙필수',track:k});
+for (const [c,n,cr] of CORES) COURSES.set(c,{code:c,name:n,credit:cr,group:'필수교양'});
+
+/* ───────── 상태 · 저장 ───────── */
+const KEY = 'khu-quest-v2', OLD_KEY = 'khu-quest-v1';
+const $ = id => document.getElementById(id);
+const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, Math.round(Number(v) || 0)));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function defaults(){ return {v:2,onboarded:false,year:'2026',track:'data',courses:{},plan:{},credits:0,free:0,dist:{},checks:{}}; }
+function sanitize(o, onboarded){
+  const s = defaults();
+  if (!o || typeof o !== 'object') return s;
+  if (YEARS.includes(String(o.year))) s.year = String(o.year);
+  if (TRACKS[o.track]) s.track = o.track;
+  for (const k of Object.keys(o.courses || {})) if (COURSES.has(k) && o.courses[k] === true) s.courses[k] = true;
+  for (const k of Object.keys(o.plan || {})) if (COURSES.has(k) && o.plan[k] === true && !s.courses[k]) s.plan[k] = true;
+  s.credits = clamp(o.credits, 0, 180);
+  s.free = clamp(o.free, 0, 99);
+  for (const a of AREAS) { const v = clamp((o.dist || {})[a], 0, 99); if (v) s.dist[a] = v; }
+  for (const id of FINAL.map(f => f[0]).concat('leader12')) if (o.checks && o.checks[id] === true) s.checks[id] = true;
+  s.onboarded = onboarded ?? o.onboarded === true;
+  return s;
+}
+let storageOK = true;
+function load(){
+  try {
+    const v2 = localStorage.getItem(KEY);
+    if (v2) return sanitize(JSON.parse(v2));
+    const v1 = localStorage.getItem(OLD_KEY);
+    if (v1) return sanitize(JSON.parse(v1), true); // 이전 버전 기록은 그대로 이어서 사용
+  } catch (e) { storageOK = false; }
+  return defaults();
+}
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(S)); storageOK = true; }
+  catch (e) { storageOK = false; }
+  $('storageBanner').hidden = storageOK;
+}
+let S = load();
+
+/* ───────── 판정 ───────── */
+const legacy = () => +S.year < 2024;
+const trackList = () => TRACKS[S.track].list.map(([c,n]) => [c,n,3]);
+function listOf(id){ return id==='base' ? FOUNDATIONS : id==='must' ? ESSENTIALS : id==='core' ? CORES : id==='choose' ? trackList() : []; }
+const earned = l => l.filter(x => S.courses[x[0]]).length;
+const distSum = () => AREAS.reduce((a,k) => a + (S.dist[k] || 0), 0);
+const distAreas = () => AREAS.filter(k => (S.dist[k] || 0) >= 3).length;
+function stat(id){
+  switch (id) {
+    case 'base': case 'must': { const l = listOf(id), e = earned(l); return {p:e/l.length, done:e===l.length, text:`${e} / ${l.length}과목 완료`}; }
+    case 'core': { if (legacy()) return {p:0, done:false, unknown:true, text:'내 학번 기준 확인 필요'}; const e = earned(CORES); return {p:e/CORES.length, done:e===CORES.length, text:`${e} / ${CORES.length}과목 완료`}; }
+    case 'choose': {
+      const l = trackList(), e = earned(l), leader = S.track === 'leader';
+      const tr = leader ? (S.checks.leader12 ? 1 : 0) : e / l.length;
+      return {p:(Math.min(S.credits/36,1)+tr)/2, done:S.credits>=36 && tr===1, text: leader ? `${S.credits} / 36학점 · 12과목 ${S.checks.leader12?'확인':'미확인'}` : `${S.credits} / 36학점 · 트랙 ${e} / ${l.length}`};
+    }
+    case 'dist': { if (legacy()) return {p:0, done:false, unknown:true, text:'내 학번 기준 확인 필요'}; const a = distAreas(), s = distSum(); return {p:(Math.min(a/3,1)+Math.min(s/9,1))/2, done:a>=3 && s>=9, text:`${a} / 3개 영역 · ${s} / 9학점`}; }
+    case 'free': { if (legacy()) return {p:0, done:false, unknown:true, text:'내 학번 기준 확인 필요'}; return {p:Math.min(S.free/3,1), done:S.free>=3, text:`${S.free} / 3학점`}; }
+    case 'final': { const n = FINAL.filter(f => S.checks[f[0]]).length; return {p:n/5, done:n===5, text:`${n} / 5개 확인`}; }
+  }
+}
+const doneSet = () => new Set(QUESTS.filter(q => stat(q.id).done).map(q => q.id));
+function creditSum(){
+  let s = 0;
+  for (const l of [FOUNDATIONS, ESSENTIALS, CORES]) for (const c of l) if (S.courses[c[0]]) s += c[2];
+  return s + S.credits + distSum() + S.free;
+}
+const planList = () => [...COURSES.values()].filter(c => S.plan[c.code] && !S.courses[c.code] && (!c.track || c.track === S.track));
+
+/* ───────── 화면: 지도 ───────── */
+function renderMap(){
+  const stats = QUESTS.map(q => ({q, s:stat(q.id)}));
+  const n = stats.filter(x => x.s.done).length, next = stats.find(x => !x.s.done);
+  const cs = creditSum();
+  $('view-map').innerHTML = `
+    <section class="hero" aria-label="나의 졸업 모험">
+      <div class="ring" style="--p:${n/7}" role="img" aria-label="7개 퀘스트 중 ${n}개 완료"><div><b>${n}/7</b><small>퀘스트</small></div></div>
+      <div>
+        <h2>${n === 7 ? '모든 배지를 모았어요!' : '나의 졸업 모험'}</h2>
+        <div class="muted">입력한 학점 합계 <b>${cs}</b> / 130학점</div>
+        <div class="bar" aria-hidden="true"><i style="width:${Math.min(cs/130,1)*100}%"></i></div>
+        <div class="muted">${legacy() ? `${S.year}학번은 적용 교육과정이 다를 수 있어요.` : `${S.year}학번 · ${TRACKS[S.track].name}`}</div>
+      </div>
+      <button class="next" data-act="open" data-id="${next ? next.q.id : 'final'}">${next ? `이어 하기 → ${next.q.name}` : '🎉 공식 졸업사정으로 마지막 확인하기'}</button>
+    </section>
+    <ol class="map">${stats.map(({q,s},i) => {
+      const st = s.unknown ? 'unknown' : s.done ? 'done' : s.p > 0 ? 'partial' : 'todo';
+      return `<li class="stop st-${st} ${i%2 ? 'rev' : ''}">
+        <div class="orb-wrap" style="--p:${s.done ? 1 : s.p}"><button class="orb" data-act="open" data-id="${q.id}" aria-label="${q.name}, ${q.formal}, ${s.text}${s.done ? ', 완료' : ''}"><span class="emo" aria-hidden="true">${q.icon}</span>${s.done ? '<span class="badge" aria-hidden="true">✓</span>' : s.unknown ? '<span class="badge" aria-hidden="true">?</span>' : ''}</button></div>
+        <button class="label" data-act="open" data-id="${q.id}" tabindex="-1" aria-hidden="true"><b>${q.name}${s.done ? ' ✓' : ''}</b><small>${q.formal}</small><span class="meta">${s.text}</span><span class="mini"><i style="width:${(s.done ? 1 : s.p)*100}%"></i></span></button>
+      </li>`;}).join('')}</ol>
+    <div class="castle ${n === 7 ? 'finished' : ''}"><span class="icon" aria-hidden="true">🏰</span><b>졸업 성</b><div class="muted">${n === 7 ? '모험 기록 완료! 공식 졸업사정으로 마지막 확인을 해요.' : `배지 ${7-n}개를 더 모으면 졸업 성에 도착해요.`}</div></div>
+    <p class="notice">지도 연결은 모험 경로예요. 실제 선수과목 순서를 뜻하지 않아요. 배지는 입력한 조건의 달성 표시이며 공식 졸업 판정이 아니에요. 전공은 ${CATALOG.split(' · ')[0]} 목록을 사용해요.</p>`;
+}
+
+/* ───────── 화면: 계획 ───────── */
+function remainingGroups(){
+  const groups = [['전공필수', ESSENTIALS], ['전공기초', FOUNDATIONS], [`트랙필수 · ${TRACKS[S.track].name}`, trackList()]];
+  if (!legacy()) groups.push(['필수교양', CORES]);
+  return groups.map(([t,l]) => [t, l.filter(c => !S.courses[c[0]])]).filter(([,l]) => l.length);
+}
+function renderPlan(){
+  const plan = planList(), total = plan.reduce((a,c) => a + c.credit, 0);
+  $('view-plan').innerHTML = `
+    <h2>다음 학기 계획</h2>
+    <p class="muted">들을 예정인 과목을 담아 두세요. 실제 개설 여부와 시간표는 수강편람에서 확인해요.</p>
+    <div class="card">
+      ${plan.length ? `<div class="row"><b>담은 과목 ${plan.length}개</b><span class="pill">${total}학점</span></div>
+        <div>${plan.map(c => `<div class="list-item"><div class="grow"><b>${esc(c.name)}</b><small>${c.group} · ${c.credit}학점${/\d/.test(c.code) ? ` · ${c.code}` : ''}</small></div>
+          <button class="icon-btn" data-act="done-from-plan" data-code="${c.code}" aria-label="${esc(c.name)} 이수 완료로 표시">이수</button>
+          <button class="icon-btn" data-act="plan" data-code="${c.code}" aria-label="${esc(c.name)} 계획에서 빼기">빼기</button></div>`).join('')}</div>`
+      : `<div class="empty"><span class="big" aria-hidden="true">🗓️</span>아직 담은 과목이 없어요.<br>아래 남은 과목에서 <b>담기</b>를 눌러 보세요.</div>`}
+    </div>
+    <div class="btns"><button class="btn primary" data-act="copy-summary">상담용 요약 복사</button><button class="btn" data-act="share-summary">공유하기</button></div>
+    <h3>아직 남은 과목</h3>
+    ${remainingGroups().map(([t,l]) => `<div class="card"><div class="row"><b>${esc(t)}</b><span class="muted">${l.length}과목 남음</span></div>
+      ${l.map(c => `<div class="list-item"><div class="grow"><b>${esc(c[1])}</b><small>${c[2]}학점</small></div>
+        <button class="icon-btn ${S.plan[c[0]] ? 'on' : ''}" data-act="plan" data-code="${c[0]}" aria-pressed="${!!S.plan[c[0]]}" aria-label="${esc(c[1])} 다음 학기 계획에 ${S.plan[c[0]] ? '담김' : '담기'}">${S.plan[c[0]] ? '담김 ✓' : '담기'}</button></div>`).join('')}</div>`).join('') || `<div class="card empty"><span class="big" aria-hidden="true">🏰</span>목록에 있는 과목은 모두 이수했어요.</div>`}
+    <p class="notice" style="margin:14px 0">전공선택·배분이수·자유이수는 과목 목록 대신 학점으로 관리해요. 대체인정·경과조치는 학과에 확인해 주세요.</p>`;
+}
+
+/* ───────── 화면: 설정 ───────── */
+function renderMe(){
+  $('view-me').innerHTML = `
+    <h2>내 정보</h2>
+    <p class="muted">이름·학번은 받지 않아요. 기록은 이 기기의 브라우저에만 저장돼요.</p>
+    <div class="card">
+      <label class="field"><span>입학연도</span><select data-field="year">${YEARS.map(y => `<option value="${y}" ${y===S.year?'selected':''}>${y}학번</option>`).join('')}</select></label>
+      <label class="field"><span>트랙</span><select data-field="track">${Object.entries(TRACKS).map(([k,t]) => `<option value="${k}" ${k===S.track?'selected':''}>${t.name}</option>`).join('')}</select></label>
+      ${legacy() ? '<div class="banner" style="margin:0">2024학번 이전은 교양 기준이 달라 앱에서 교양 퀘스트를 판정하지 않아요. 적용 교육과정을 학과에 먼저 확인해 주세요.</div>' : ''}
+    </div>
+    <h3>빠르게 채우기</h3>
+    <div class="card"><b>성적표 붙여넣기</b><p class="muted" style="margin:4px 0 0">종합정보시스템 성적표 화면의 글자를 복사해 붙여넣으면, 과목 코드와 이름을 찾아 한 번에 체크해요. 내용은 이 기기 안에서만 분석해요.</p>
+      <button class="btn primary block" style="margin-top:10px" data-act="open-paste">성적표 붙여넣기</button></div>
+    <h3>기록 관리</h3>
+    <div class="card">
+      <div class="btns" style="margin-top:0"><button class="btn" data-act="export">백업 파일 저장</button><button class="btn" data-act="import">백업 불러오기</button></div>
+      <div class="btns"><button class="btn" data-act="copy-summary">상담용 요약 복사</button><button class="btn danger" data-act="open-reset">기록 초기화</button></div>
+    </div>
+    <h3>도움말</h3>
+    <div class="card"><button class="btn block" data-act="open-help">사용법 · 근거 · 개인정보</button></div>
+    <p class="notice" style="margin:14px 0">졸업 원정대 v${APP_VERSION} · 교육과정 기준: ${CATALOG}<br>이 앱은 공식 졸업사정을 대체하지 않아요.</p>`;
+}
+
+/* ───────── 바텀시트 ───────── */
+let sheet = null, lastFocus = null, parsed = [];
+function openSheet(kind, id){
+  const wasOpen = !$('veil').hidden;
+  sheet = {kind, id};
+  if (!wasOpen) {
+    lastFocus = document.activeElement;
+    try { history.pushState({sheet:true}, ''); } catch (e) {}
+  }
+  $('veil').hidden = false;
+  document.body.style.overflow = 'hidden';
+  paintSheet();
+  if (!wasOpen) { $('sheet').scrollTop = 0; $('sheet').querySelector('.close').focus(); }
+}
+function closeSheet(fromHistory){
+  if ($('veil').hidden) return;
+  $('veil').hidden = true; sheet = null;
+  document.body.style.overflow = '';
+  if (!fromHistory && history.state && history.state.sheet) { try { history.back(); } catch (e) {} }
+  if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
+}
+window.addEventListener('popstate', () => closeSheet(true));
+function stepper(field, value, step, max, label){
+  return `<div class="stepper" role="group" aria-label="${label}"><button data-act="step" data-field="${field}" data-d="${-step}" aria-label="${label} ${step}학점 빼기">−</button>
+    <input class="input" type="number" inputmode="numeric" min="0" max="${max}" value="${value}" data-field="${field}" aria-label="${label}">
+    <button data-act="step" data-field="${field}" data-d="${step}" aria-label="${label} ${step}학점 더하기">+</button></div>`;
+}
+function taskRow(c, icon){
+  const done = !!S.courses[c[0]], planned = !!S.plan[c[0]];
+  return `<div class="task ${done ? 'done' : ''}">
+    <button class="main" data-act="toggle" data-code="${c[0]}" data-key="t-${c[0]}" aria-pressed="${done}"><span class="token" aria-hidden="true">${icon}</span><span class="txt"><b>${esc(c[1])}</b><small>${c[2]}학점${/\d/.test(c[0]) ? ` · ${c[0]}` : ''}${planned ? ' · 다음 학기 계획' : ''}</small></span><span class="tick" aria-hidden="true">${done ? '✓' : '○'}</span></button>
+    ${done ? '' : `<button class="plan ${planned ? 'on' : ''}" data-act="plan" data-code="${c[0]}" data-key="p-${c[0]}" aria-pressed="${planned}" aria-label="${esc(c[1])} 다음 학기 계획">${planned ? '계획<br>담김' : '다음<br>학기'}</button>`}
+  </div>`;
+}
+function checkRow(id, title, sub){
+  const on = !!S.checks[id];
+  return `<div class="task ${on ? 'done' : ''}"><button class="main" data-act="check" data-id="${id}" data-key="c-${id}" aria-pressed="${on}"><span class="token" aria-hidden="true">⭐</span><span class="txt"><b>${title}</b><small>${sub}</small></span><span class="tick" aria-hidden="true">${on ? '✓' : '○'}</span></button></div>`;
+}
+function paintSheet(){
+  if (!sheet) return;
+  const body = $('sheetBody'), keep = $('sheet').scrollTop;
+  let title = '', sub = '', html = '';
+  if (sheet.kind === 'quest') {
+    const q = QUESTS.find(x => x.id === sheet.id), s = stat(q.id);
+    title = `${q.icon} ${q.name}`; sub = `${q.formal} · ${s.text}`;
+    html = `<div class="bar" aria-hidden="true"><i style="width:${(s.done ? 1 : s.p)*100}%"></i></div><p class="muted">${q.why}</p>`;
+    if (['core','dist','free'].includes(q.id) && legacy()) html += `<div class="banner" style="margin:0 0 8px">${S.year}학번은 이 구역의 기준이 달라 앱에서 판정하지 않아요. 기록은 남길 수 있어요.</div>`;
+    if (['base','must','core','choose'].includes(q.id)) html += '<p class="muted">이미 이수한 수업을 누르면 완료, 다시 누르면 취소돼요. 오른쪽 칸은 다음 학기 계획에 담아요.</p>';
+    if (q.id === 'core') html += '<p class="muted">주제연구 전에 성찰과표현을 이수해야 해요. 영어 대체·면제는 학교 확인이 필요해요.</p>';
+    if (q.id === 'choose') html += `<div class="seg" role="group" aria-label="트랙 선택">${Object.entries(TRACKS).map(([k,t]) => `<button data-act="track" data-track="${k}" aria-pressed="${k===S.track}">${t.name}</button>`).join('')}</div>`;
+    html += listOf(q.id).map(c => taskRow(c, q.icon)).join('');
+    if (q.id === 'choose') {
+      if (S.track === 'leader') html += checkRow('leader12','선택 과목 12개 이상 들었어요','융합리더는 학점과 과목 수를 함께 확인해요');
+      html += `<label class="field"><span>전공선택 총 이수학점 (트랙 과목 포함)</span></label>${stepper('credits', S.credits, 3, 180, '전공선택 이수학점')}<p class="muted">성적표의 전공선택 학점 합계를 넣어 주세요. 학점 합산만으로 대체인정을 확정하지는 않아요.</p>`;
+    }
+    if (q.id === 'dist') html += `<p class="muted">성적표에 적힌 영역별 학점을 넣으세요. 과목명을 검색할 필요 없어요. 같은 과목을 두 영역에 중복 입력하지 마세요.</p>` + AREAS.map((a,i) => `<label class="field" style="margin-bottom:0"><span>${a}${(S.dist[a]||0) >= 3 ? ' ✓' : ''}</span></label>${stepper('dist:'+i, S.dist[a] || 0, 1, 99, a)}`).join('');
+    if (q.id === 'free') html += `<p class="muted">성적표의 자유이수 학점을 입력하세요.</p>${stepper('free', S.free, 1, 99, '자유이수 학점')}`;
+    if (q.id === 'final') html += '<p class="muted">마지막은 직접 확인하는 퀘스트예요. 학교 졸업사정 결과와 비교해 주세요.</p>' + FINAL.map(f => checkRow(...f)).join('');
+  } else if (sheet.kind === 'paste') {
+    title = '📋 성적표 붙여넣기'; sub = '이 기기 안에서만 분석해요';
+    html = `<p class="muted">성적표 화면에서 전체 선택(Ctrl+A) → 복사 → 아래에 붙여넣기 하세요. 과목 코드나 과목명이 있으면 찾아낼 수 있어요.</p>
+      <textarea id="pasteBox" placeholder="예) CSE103 객체지향프로그래밍 3 A+&#10;CSE204 자료구조 3 A0" aria-label="성적표 내용"></textarea>
+      <button class="btn primary block" style="margin-top:10px" data-act="parse">과목 찾기</button><div id="parseOut" aria-live="polite"></div>`;
+  } else if (sheet.kind === 'reset') {
+    title = '기록을 지울까요?'; sub = '이 기기에 저장된 체크·학점·계획이 모두 사라져요';
+    html = `<p class="muted">지우기 전에 백업 파일을 저장해 두면 언제든 다시 불러올 수 있어요.</p>
+      <div class="btns"><button class="btn" data-act="export">백업 먼저 저장</button><button class="btn danger" data-act="reset">모두 지우기</button></div>`;
+  } else if (sheet.kind === 'help') {
+    title = '🧭 사용법 · 근거'; sub = `v${APP_VERSION}`;
+    html = `<h3>사용법</h3><p class="muted">① 지도에서 구역을 눌러요.<br>② 이미 들은 수업을 톡 눌러요. 다시 누르면 취소돼요.<br>③ 구역 조건을 채우면 버건디 배지가 생겨요.<br>④ 들을 예정인 과목은 ‘다음 학기’에 담고, 계획 탭에서 모아 봐요.<br>⑤ 상담 전에는 ‘상담용 요약 복사’로 남은 요건을 정리해 가요.</p>
+      <h3>근거와 적용 범위</h3><p class="muted">전공 과목은 ${CATALOG.split(' · ')[0]} 목록, 교양은 2024학번 이후 기준을 사용해요. 과거 학번별 필수 목록·대체인정·경과조치와 전체 배분이수 과목 목록은 아직 검증 전이에요. 배지는 입력한 조건의 달성 표시일 뿐, 공식 졸업사정을 대체하지 않아요.</p>
+      <h3>개인정보</h3><p class="muted">이름·학번·로그인을 받지 않아요. 모든 기록과 붙여넣은 성적표는 이 기기의 브라우저 안에서만 처리되고, 어떤 서버로도 보내지 않아요. 브라우저 데이터를 지우면 기록도 사라지니 백업 파일을 활용해 주세요.</p>
+      <h3>디자인 참고</h3><p class="muted">단계형 학습 경로, 게임의 스테이지 지도, RPG 퀘스트 배지의 상호작용 방식을 참고한 독자적인 화면이에요. 경쟁이나 유료 보상은 넣지 않았어요.</p>`;
+  }
+  $('sheetTitle').textContent = title; $('sheetSub').textContent = sub; body.innerHTML = html;
+  $('sheet').scrollTop = keep;
+}
+
+/* ───────── 변경 · 되돌리기 · 축하 ───────── */
+let toastTimer, undoSnap = null;
+function toast(msg, undo){
+  clearTimeout(toastTimer);
+  undoSnap = undo || null;
+  const t = $('toast');
+  t.innerHTML = `<span>${esc(msg)}</span>${undo ? '<button data-act="undo">되돌리기</button>' : ''}`;
+  t.hidden = false;
+  toastTimer = setTimeout(() => { t.hidden = true; undoSnap = null; }, undo ? 4500 : 2600);
+}
+function celebrate(x, y, big){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  for (let i = 0; i < (big ? 28 : 12); i++) {
+    const el = document.createElement('span');
+    el.className = 'spark'; el.textContent = ['✨','🌟','🍃','🎉'][i % (big ? 4 : 3)];
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    el.style.setProperty('--x', (Math.random()*300-150) + 'px');
+    el.style.setProperty('--y', (-80-Math.random()*220) + 'px');
+    document.body.append(el); setTimeout(() => el.remove(), 1200);
+  }
+}
+function mutate(fn, e, msg){
+  const snap = JSON.stringify(S), before = doneSet();
+  fn();
+  save(); renderAll();
+  const after = doneSet(), gained = QUESTS.filter(q => after.has(q.id) && !before.has(q.id));
+  const x = e && e.clientX ? e.clientX : innerWidth/2, y = e && e.clientY ? e.clientY : innerHeight/2;
+  if (after.size === 7 && before.size < 7) { toast('🏰 졸업 성 도착! 공식 졸업사정으로 마지막 확인을 해요.', snap); celebrate(x, y, true); }
+  else if (gained.length) { toast(`🏆 ${gained[0].name} 퀘스트 달성!`, snap); celebrate(x, y); }
+  else if (msg) toast(msg, snap);
+}
+function renderAll(){
+  const ob = !S.onboarded;
+  $('view-onboard').hidden = !ob; $('tabbar').hidden = ob; $('profileChip').hidden = ob;
+  if (ob) { renderOnboard(); ['map','plan','me'].forEach(v => $('view-'+v).hidden = true); return; }
+  $('profileChip').textContent = `${S.year}학번 · ${TRACKS[S.track].name}`;
+  $('profileChip').setAttribute('aria-label', `내 정보: ${S.year}학번, ${TRACKS[S.track].name} 트랙. 설정 열기`);
+  const n = planList().length; $('planDot').hidden = !n; $('planDot').textContent = n;
+  ['map','plan','me'].forEach(v => $('view-'+v).hidden = v !== tab);
+  document.querySelectorAll('.tab').forEach(b => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  renderMap(); renderPlan(); renderMe(); paintSheet();
+  $('storageBanner').hidden = storageOK;
+}
+let tab = 'map';
+function setTab(t){
+  tab = t; renderAll(); window.scrollTo(0, 0);
+  const h = $('view-'+t).querySelector('h2'); if (h) { h.tabIndex = -1; h.focus({preventScroll:true}); }
+}
+
+/* ───────── 온보딩 ───────── */
+function renderOnboard(){
+  $('view-onboard').innerHTML = `
+    <div class="hero-emoji" aria-hidden="true">🏰</div>
+    <h2>졸업까지 가는 길을<br>지도로 보여드릴게요</h2>
+    <p class="muted" style="text-align:center">교육과정 문서를 다시 읽지 않아도 돼요.</p>
+    <div class="card"><ol><li>지도에서 구역을 눌러요</li><li>이미 들은 수업을 톡 눌러요</li><li>남은 과목은 다음 학기 계획에 담아요</li></ol></div>
+    <div class="card">
+      <label class="field"><span>입학연도</span><select data-field="year">${YEARS.map(y => `<option value="${y}" ${y===S.year?'selected':''}>${y}학번</option>`).join('')}</select></label>
+      <label class="field"><span>트랙</span><select data-field="track">${Object.entries(TRACKS).map(([k,t]) => `<option value="${k}" ${k===S.track?'selected':''}>${t.name}</option>`).join('')}</select></label>
+      <p class="muted">소프트웨어융합학과 단일전공 기준이에요. 이름·학번은 받지 않고, 기록은 이 기기에만 저장돼요.</p>
+    </div>
+    <button class="btn primary block" data-act="start">시작하기</button>
+    <button class="btn block" style="margin-top:8px" data-act="start-paste">성적표 붙여넣고 빠르게 시작</button>
+    <p class="notice" style="margin:16px 0 0">배지는 입력한 조건의 달성 표시이며 공식 졸업 판정이 아니에요.</p>`;
+}
+
+/* ───────── 성적표 분석 · 요약 · 백업 ───────── */
+const norm = s => String(s).replace(/[\s·・\-\/()（）_.,]/g, '').toUpperCase();
+function parseTranscript(text){
+  const T = norm(text), out = [];
+  for (const c of COURSES.values()) {
+    if (c.track && c.track !== S.track) continue;
+    const byCode = /\d/.test(c.code) && new RegExp(`(^|[^A-Z0-9])${c.code}($|[^0-9])`, 'i').test(text.toUpperCase());
+    const byName = T.includes(norm(c.name));
+    if (byCode || byName) out.push({...c, by: byCode ? '코드' : '과목명'});
+  }
+  return out;
+}
+function summaryText(){
+  const d = new Date().toLocaleDateString('ko-KR'), L = [];
+  L.push(`[경희졸업길잡이 · 상담용 요약] ${d}`);
+  L.push(`${S.year}학번 · ${TRACKS[S.track].name} 트랙 (소프트웨어융합학과 단일전공 참고 경로)`);
+  L.push(`퀘스트 ${doneSet().size} / 7 완료 · 입력한 학점 합계 ${creditSum()} / 130`);
+  L.push('');
+  for (const [t,l] of remainingGroups()) L.push(`■ 남은 ${t}: ${l.map(c => `${c[1]}(${c[2]})`).join(', ')}`);
+  L.push(`■ 전공선택: ${stat('choose').text}`);
+  L.push(legacy() ? '■ 교양(필수·배분·자유): 내 학번 기준 확인 필요' : `■ 배분이수: ${stat('dist').text} · 자유이수: ${stat('free').text}`);
+  const pend = FINAL.filter(f => !S.checks[f[0]]).map(f => f[1].replace(/했어요|웠어요/, '').trim());
+  if (pend.length) L.push(`■ 아직 확인 안 한 졸업 요건: ${pend.join(' / ')}`);
+  const plan = planList();
+  if (plan.length) L.push(`■ 다음 학기 계획: ${plan.map(c => c.name).join(', ')} (총 ${plan.reduce((a,c) => a + c.credit, 0)}학점)`);
+  L.push('');
+  L.push('※ 본인이 입력한 정보 기준이며 공식 졸업사정이 아닙니다. 대체인정·경과조치 확인 부탁드립니다.');
+  return L.join('\n');
+}
+async function copyText(t){
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = t; ta.setAttribute('readonly',''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.append(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (_) {} ta.remove(); return ok;
+  }
+}
+function exportBackup(){
+  const blob = new Blob([JSON.stringify({app:'khu-graduation-quest', version:APP_VERSION, exported:new Date().toISOString(), data:S}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'), d = new Date();
+  a.href = URL.createObjectURL(blob);
+  a.download = `졸업원정대-백업-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.json`;
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('백업 파일을 저장했어요.');
+}
+$('importFile').addEventListener('change', e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  if (f.size > 200000) { toast('백업 파일이 아니에요.'); return; }
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const o = JSON.parse(r.result);
+      if (!o || o.app !== 'khu-graduation-quest' || !o.data) throw 0;
+      mutate(() => { S = sanitize(o.data, true); }, null, '백업을 불러왔어요.');
+    } catch (_) { toast('백업 파일을 읽을 수 없어요.'); }
+  };
+  r.readAsText(f);
+});
+
+/* ───────── 이벤트 ───────── */
+const actions = {
+  tab: t => { closeSheet(); setTab(t.dataset.tab); },
+  open: t => openSheet('quest', t.dataset.id),
+  close: () => closeSheet(),
+  toggle: (t,e) => { const c = t.dataset.code, on = !S.courses[c]; mutate(() => { if (on) { S.courses[c] = true; delete S.plan[c]; } else delete S.courses[c]; }, e, on ? '✨ 수업 완료! 길이 조금 더 밝아졌어요.' : '완료 표시를 취소했어요.'); },
+  plan: (t,e) => { const c = t.dataset.code, on = !S.plan[c]; mutate(() => { if (on) S.plan[c] = true; else delete S.plan[c]; }, e, on ? '🗓️ 다음 학기 계획에 담았어요.' : '계획에서 뺐어요.'); },
+  'done-from-plan': (t,e) => { const c = t.dataset.code; mutate(() => { S.courses[c] = true; delete S.plan[c]; }, e, '✨ 이수 완료로 옮겼어요.'); },
+  check: (t,e) => { const id = t.dataset.id, on = !S.checks[id]; mutate(() => { if (on) S.checks[id] = true; else delete S.checks[id]; }, e, on ? '⭐ 확인했어요.' : '확인 표시를 취소했어요.'); },
+  track: (t,e) => { const k = t.dataset.track; if (k !== S.track) mutate(() => { S.track = k; }, e, `${TRACKS[k].name} 트랙으로 바꿨어요.`); },
+  step: (t,e) => setField(t.dataset.field, Number(t.dataset.d), true, e),
+  undo: () => { if (!undoSnap) return; S = sanitize(JSON.parse(undoSnap), true); save(); renderAll(); $('toast').hidden = true; undoSnap = null; },
+  start: () => { S.onboarded = true; save(); tab = 'map'; renderAll(); },
+  'start-paste': () => { S.onboarded = true; save(); tab = 'map'; renderAll(); openSheet('paste'); },
+  'open-paste': () => openSheet('paste'),
+  'open-reset': () => openSheet('reset'),
+  'open-help': () => openSheet('help'),
+  parse: () => {
+    const text = $('pasteBox').value;
+    parsed = parseTranscript(text);
+    const fresh = parsed.filter(c => !S.courses[c.code]);
+    $('parseOut').innerHTML = !text.trim() ? '<p class="muted">붙여넣은 내용이 없어요.</p>'
+      : !parsed.length ? '<div class="empty">앱 목록에 있는 과목을 찾지 못했어요.<br>과목 코드나 과목명이 포함됐는지 확인해 주세요.</div>'
+      : `<h3>찾은 과목 ${parsed.length}개 ${fresh.length < parsed.length ? `<span class="muted">(${parsed.length - fresh.length}개는 이미 완료)</span>` : ''}</h3>
+        <p class="muted">F·재수강 전 기록처럼 인정되지 않는 과목은 체크를 풀어 주세요.</p>
+        ${parsed.map((c,i) => `<label class="check-row"><input type="checkbox" data-pi="${i}" ${S.courses[c.code] ? 'checked disabled' : 'checked'}><span><b>${esc(c.name)}</b> <span class="muted">${c.group} · ${c.credit}학점 · ${c.by}로 찾음</span></span></label>`).join('')}
+        ${fresh.length ? `<button class="btn primary block" style="margin-top:10px" data-act="apply-parse">선택한 과목 이수 처리</button>` : ''}`;
+  },
+  'apply-parse': (t,e) => {
+    const picked = [...document.querySelectorAll('[data-pi]')].filter(x => x.checked && !x.disabled).map(x => parsed[+x.dataset.pi]);
+    if (!picked.length) { toast('선택한 과목이 없어요.'); return; }
+    closeSheet();
+    mutate(() => { for (const c of picked) { S.courses[c.code] = true; delete S.plan[c.code]; } }, e, `📋 ${picked.length}과목을 이수 처리했어요.`);
+  },
+  'copy-summary': async () => toast(await copyText(summaryText()) ? '상담용 요약을 복사했어요. 메일·메신저에 붙여넣으세요.' : '복사하지 못했어요. 공유하기를 이용해 주세요.'),
+  'share-summary': async () => {
+    const text = summaryText();
+    if (navigator.share) { try { await navigator.share({title:'졸업 원정대 상담용 요약', text}); } catch (_) {} }
+    else toast(await copyText(text) ? '공유를 지원하지 않아 클립보드에 복사했어요.' : '이 브라우저에서는 공유할 수 없어요.');
+  },
+  export: () => exportBackup(),
+  import: () => $('importFile').click(),
+  reset: () => { closeSheet(); mutate(() => { S = {...defaults(), onboarded:true, year:S.year, track:S.track}; }, null, '기록을 지웠어요.'); }
+};
+function setField(field, value, delta, e){
+  mutate(() => {
+    const cur = field === 'credits' ? S.credits : field === 'free' ? S.free : (S.dist[AREAS[+field.split(':')[1]]] || 0);
+    const v = delta ? cur + value : value;
+    if (field === 'credits') S.credits = clamp(v, 0, 180);
+    else if (field === 'free') S.free = clamp(v, 0, 99);
+    else if (field.startsWith('dist:')) { const a = AREAS[+field.split(':')[1]], n = clamp(v, 0, 99); if (n) S.dist[a] = n; else delete S.dist[a]; }
+    else if (field === 'year' && YEARS.includes(value)) S.year = value;
+    else if (field === 'track' && TRACKS[value]) S.track = value;
+  }, e);
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act]');
+  if (!t || t.disabled) return;
+  const key = t.dataset.key;
+  if (e.target === $('veil')) return;
+  actions[t.dataset.act]?.(t, e);
+  if (key) { const again = document.querySelector(`[data-key="${key}"]`); if (again) again.focus(); }
+});
+$('veil').addEventListener('click', e => { if (e.target === $('veil')) closeSheet(); });
+document.addEventListener('change', e => {
+  const f = e.target.dataset && e.target.dataset.field;
+  if (!f) return;
+  if (f === 'year' || f === 'track') setField(f, e.target.value, false);
+  else setField(f, Number(e.target.value), false);
+});
+document.addEventListener('keydown', e => {
+  if ($('veil').hidden) return;
+  if (e.key === 'Escape') { closeSheet(); return; }
+  if (e.key === 'Tab') {
+    const f = [...$('sheet').querySelectorAll('button:not([disabled]),input:not([disabled]),textarea,select')].filter(x => x.offsetParent !== null);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length-1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length-1]) { e.preventDefault(); f[0].focus(); }
+  }
+});
+window.addEventListener('storage', e => { if (e.key === KEY) { S = load(); renderAll(); } });
+renderAll();
+</script>
+</body>
+</html>
